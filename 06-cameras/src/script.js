@@ -21,9 +21,44 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Sizes
 const sizes = {
-    width: 800,
-    height: 600
+    width: window.innerWidth,
+    height: window.innerHeight
 }
+
+window.addEventListener('resize', () => {
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Updating renderer with size and pixel ratios
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
+
+window.addEventListener('dblclick', () => {
+
+    const fullscreenElement = document.fullscreenElement || document.webkitfullscreenElement
+
+    if (!fullscreenElement) {
+        if (canvas.requestFullscreen) {
+            canvas.requestFullscreen()
+        }
+        else if (canvas.webkitRequestFullscreen) {
+            canvas.webkitRequestFullscreen()
+        }
+    }
+    else {
+
+        if (document.exitFullscreen) {
+            document.exitFullscreen()
+        }
+        else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen()
+        }
+    }
+})
 
 // Scene
 const scene = new THREE.Scene()
@@ -35,9 +70,7 @@ const mesh = new THREE.Mesh(
 )
 scene.add(mesh)
 
-// Camera
-const aspectRatio = sizes.width / sizes.height
-const camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 100)
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 // const camera = new THREE.OrthographicCamera(
 //     -1 * aspectRatio,
 //     1 * aspectRatio,
@@ -61,7 +94,9 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
+
 renderer.setSize(sizes.width, sizes.height)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 // Animate
 const clock = new THREE.Clock()
